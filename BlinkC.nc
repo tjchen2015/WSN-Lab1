@@ -39,36 +39,52 @@
 module BlinkC @safe()
 {
   uses interface Timer<TMilli> as Timer0;
-  uses interface Timer<TMilli> as Timer1;
-  uses interface Timer<TMilli> as Timer2;
   uses interface Leds;
   uses interface Boot;
 }
 implementation
 {
+  uint8_t counter = 0;
+  
   event void Boot.booted()
   {
-    call Timer0.startPeriodic( 250 );
-    call Timer1.startPeriodic( 500 );
-    call Timer2.startPeriodic( 1000 );
+	call Timer0.startPeriodic( 1000 );
   }
 
   event void Timer0.fired()
   {
-    dbg("BlinkC", "Timer 0 fired @ %s.\n", sim_time_string());
-    call Leds.led0Toggle();
-  }
-  
-  event void Timer1.fired()
-  {
-    dbg("BlinkC", "Timer 1 fired @ %s \n", sim_time_string());
-    call Leds.led1Toggle();
-  }
-  
-  event void Timer2.fired()
-  {
-    dbg("BlinkC", "Timer 2 fired @ %s.\n", sim_time_string());
-    call Leds.led2Toggle();
+    counter++;
+	if(counter > 15){
+		counter = 0;
+	}
+	
+	if(counter & 0x1){
+		call Leds.led2On();
+	}
+	else{
+		call Leds.led2Off();
+	}
+	
+	if(counter & 0x2){
+		call Leds.led0On();
+	}
+	else{
+		call Leds.led0Off();
+	}
+	
+	if(counter & 0x4){
+		call Leds.led1On();
+	}
+	else{
+		call Leds.led1Off();
+	}
+	
+	if(counter & 0x8){
+		call Leds.led3On();
+	}
+	else{
+		call Leds.led3Off();
+	}
   }
 }
 
